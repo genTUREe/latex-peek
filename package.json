@@ -1,0 +1,39 @@
+{
+  "name": "latex-peek",
+  "displayName": "LaTeX Peek",
+  "description": "Preview a selected LaTeX formula in VS Code.",
+  "version": "0.1.0",
+  "publisher": "genturee",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:latexPeek.previewSelectedFormula"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "latexPeek.previewSelectedFormula",
+        "title": "LaTeX Peek: Preview Selected Formula"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "test": "npm run compile && node --test ./out/test/*.test.js"
+  },
+  "dependencies": {
+    "katex": "^0.19.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.8.3"
+  }
+}
