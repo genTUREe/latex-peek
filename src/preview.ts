@@ -16,11 +16,12 @@ export function getWebviewContent(
     body { padding: 1rem; color: var(--vscode-editor-foreground); }
     #status { color: var(--vscode-descriptionForeground); }
     #formula { overflow-x: auto; padding: 1rem 0; }
+    #formula .katex { font-size: calc(1.21em * var(--preview-scale, 1)); }
     #error { color: var(--vscode-errorForeground); white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <p id="status" role="status">Waiting for a formula…</p>
+  <p id="status" role="status">Waiting for a formula...</p>
   <div id="formula"></div>
   <p id="error" role="alert"></p>
   <script nonce="${nonce}" src="${katexScriptUri}"></script>
@@ -36,14 +37,19 @@ export function getWebviewContent(
         return;
       }
 
+      const scale = Number(message.scale);
+      formula.style.setProperty(
+        '--preview-scale',
+        String(Number.isFinite(scale) ? Math.min(2, Math.max(0.5, scale)) : 1)
+      );
       formula.replaceChildren();
       error.textContent = '';
       if (message.latex.trim().length === 0) {
-        status.textContent = 'Select a LaTeX formula in the editor, then run Preview Selected Formula.';
+        status.textContent = 'Move the cursor into a LaTeX formula or select one.';
         return;
       }
 
-      status.textContent = 'Rendering formula…';
+      status.textContent = 'Rendering formula...';
       try {
         katex.render(message.latex, formula, { displayMode: true, throwOnError: true });
         status.textContent = '';

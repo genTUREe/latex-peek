@@ -16,12 +16,32 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "keybindings": [
+      {
+        "command": "latexPeek.previewSelectedFormula",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m",
+        "when": "editorTextFocus"
+      }
+    ],
     "commands": [
       {
         "command": "latexPeek.previewSelectedFormula",
         "title": "LaTeX Peek: Preview Formula at Cursor or Selection"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "LaTeX Peek",
+      "properties": {
+        "latexPeek.preview.scale": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.5,
+          "maximum": 2,
+          "description": "Scale the formula in the LaTeX Peek preview (1 = 100%)."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
