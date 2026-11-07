@@ -2,6 +2,8 @@
 
 A small Visual Studio Code extension for previewing a selected LaTeX formula with KaTeX.
 
+**Website:** [latexpeek.vercel.app](https://latexpeek.vercel.app/)
+
 ## Try it locally
 
 1. Install [Node.js](https://nodejs.org/) and Visual Studio Code.
