@@ -19,7 +19,7 @@
     "commands": [
       {
         "command": "latexPeek.previewSelectedFormula",
-        "title": "LaTeX Peek: Preview Selected Formula"
+        "title": "LaTeX Peek: Preview Formula at Cursor or Selection"
       }
     ]
   },
