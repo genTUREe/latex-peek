@@ -2,7 +2,9 @@
 
 A small Visual Studio Code extension for previewing a selected LaTeX formula with KaTeX.
 
-**Website:** [latexpeek.vercel.app](https://latexpeek.vercel.app/)
+[![Open the live LaTeX Peek website](website/preview.png)](https://latexpeek.vercel.app/)
+
+**[Open the live website →](https://latexpeek.vercel.app/)**
 
 ## Try it locally
 
@@ -17,5 +19,7 @@ The preview opens in a panel and updates each time you run the command. If there
 
 - `npm test` compiles the extension and runs its tests.
 - `npm run compile` compiles the TypeScript sources.
+
+The static website source is in `website/`; open `website/index.html` in a browser to preview it locally.
 
 The extension currently previews the selected text as display math; it does not parse a complete LaTeX document or provide a live-updating preview.
