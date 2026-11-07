@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { getMathAtPosition } from './math';
 import { getWebviewContent } from './preview';
 
 let previewPanel: vscode.WebviewPanel | undefined;
@@ -9,9 +10,14 @@ let currentFormula = '';
 export function activate(context: vscode.ExtensionContext): void {
   const command = vscode.commands.registerCommand(
     'latexPeek.previewSelectedFormula',
-    () => {
+    async () => {
       const editor = vscode.window.activeTextEditor;
-      currentFormula = editor?.document.getText(editor.selection) ?? '';
+      currentFormula = getFormulaForEditor(editor);
+      if (currentFormula.trim().length === 0) {
+        await vscode.window.showInformationMessage(
+          'Place the cursor inside a LaTeX math expression or select a formula to preview it.'
+        );
+      }
 
       if (!previewPanel) {
         previewPanel = vscode.window.createWebviewPanel(
@@ -65,7 +71,31 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   );
 
-  context.subscriptions.push(command);
+  const selectionListener = vscode.window.onDidChangeTextEditorSelection((event) => {
+    if (!previewPanel || event.textEditor !== vscode.window.activeTextEditor) {
+      return;
+    }
+
+    currentFormula = getFormulaForEditor(event.textEditor, event.selections[0]);
+    void previewPanel.webview.postMessage({
+      type: 'render',
+      latex: currentFormula
+    });
+  });
+
+  const editorListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
+    if (!previewPanel || !editor) {
+      return;
+    }
+
+    currentFormula = getFormulaForEditor(editor);
+    void previewPanel.webview.postMessage({
+      type: 'render',
+      latex: currentFormula
+    });
+  });
+
+  context.subscriptions.push(command, selectionListener, editorListener);
 }
 
 export function deactivate(): void {}
@@ -79,4 +109,22 @@ function isReadyMessage(message: unknown): message is { type: 'ready' } {
     && message !== null
     && 'type' in message
     && message.type === 'ready';
+}
+
+function getFormulaForEditor(
+  editor: vscode.TextEditor | undefined,
+  selection = editor?.selection
+): string {
+  if (!editor || !selection) {
+    return '';
+  }
+
+  if (!selection.isEmpty) {
+    return editor.document.getText(selection);
+  }
+
+  return getMathAtPosition(
+    editor.document.getText(),
+    editor.document.offsetAt(selection.active)
+  ) ?? '';
 }
