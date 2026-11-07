@@ -51,10 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
         previewPanel.webview.onDidReceiveMessage((message: unknown) => {
           if (isReadyMessage(message)) {
-            void previewPanel?.webview.postMessage({
-              type: 'render',
-              latex: currentFormula
-            });
+            void postPreviewUpdate();
           }
         }, undefined, context.subscriptions);
 
@@ -63,10 +60,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }, undefined, context.subscriptions);
       } else {
         previewPanel.reveal(vscode.ViewColumn.Beside);
-        void previewPanel.webview.postMessage({
-          type: 'render',
-          latex: currentFormula
-        });
+        void postPreviewUpdate();
       }
     }
   );
@@ -77,10 +71,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     currentFormula = getFormulaForEditor(event.textEditor, event.selections[0]);
-    void previewPanel.webview.postMessage({
-      type: 'render',
-      latex: currentFormula
-    });
+    void postPreviewUpdate();
   });
 
   const editorListener = vscode.window.onDidChangeActiveTextEditor((editor) => {
@@ -89,13 +80,16 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     currentFormula = getFormulaForEditor(editor);
-    void previewPanel.webview.postMessage({
-      type: 'render',
-      latex: currentFormula
-    });
+    void postPreviewUpdate();
   });
 
-  context.subscriptions.push(command, selectionListener, editorListener);
+  const configurationListener = vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration('latexPeek.preview.scale')) {
+      void postPreviewUpdate();
+    }
+  });
+
+  context.subscriptions.push(command, selectionListener, editorListener, configurationListener);
 }
 
 export function deactivate(): void {}
@@ -127,4 +121,17 @@ function getFormulaForEditor(
     editor.document.getText(),
     editor.document.offsetAt(selection.active)
   ) ?? '';
+}
+
+function postPreviewUpdate(): Thenable<boolean> | undefined {
+  if (!previewPanel) {
+    return undefined;
+  }
+
+  const scale = vscode.workspace.getConfiguration('latexPeek.preview').get<number>('scale', 1);
+  return previewPanel.webview.postMessage({
+    type: 'render',
+    latex: currentFormula,
+    scale
+  });
 }

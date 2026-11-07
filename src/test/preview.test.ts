@@ -61,6 +61,8 @@ test('creates a webview with restricted content security policy and local KaTeX 
   assert.match(html, /href="vscode-webview:\/\/test\/katex\.min\.css"/);
   assert.match(html, /src="vscode-webview:\/\/test\/katex\.min\.js"/);
   assert.match(html, /vscode\.postMessage\(\{ type: 'ready' \}\)/);
+  assert.match(html, /--preview-scale/);
+  assert.match(html, /Math\.min\(2, Math\.max\(0\.5, scale\)\)/);
 });
 
 test('receives formulas as messages and displays them through KaTeX, not HTML interpolation', () => {
@@ -87,5 +89,5 @@ test('shows guidance when the selection is empty', () => {
   );
 
   assert.match(html, /message\.latex\.trim\(\)\.length === 0/);
-  assert.match(html, /Select a LaTeX formula in the editor/);
+  assert.match(html, /Move the cursor into a LaTeX formula or select one/);
 });
